@@ -23,19 +23,17 @@ public class ItemServiceImpl implements ItemService {
 
     @Override
     public void saveItem(ItemDTO itemDTO) {
-        try{
-            Item item = new Item();
-
-            if(itemDTO.getId() == null){
-                throw new RuntimeException("item id is null");
-            }
-            if(itemDTO.getName() == null){
+        log.info("Saving item into DB");
+        try {
+            if (itemDTO.getName() == null) {
                 throw new RuntimeException("item name is null");
             }
 
+            Item item = new Item();
             item.setName(itemDTO.getName());
             itemRepository.save(item);
         } catch (Exception e) {
+            log.error("Error saving item: {}", e.getMessage(), e);
             throw new RuntimeException(e);
         }
     }
@@ -43,7 +41,7 @@ public class ItemServiceImpl implements ItemService {
     @Override
     public List<ItemDTO> getItems() {
         log.info("getItems");
-        try{
+        try {
             List<Item> items = itemRepository.findAll();
             List<ItemDTO> itemDTOS = new ArrayList<>();
             for (Item item : items) {
@@ -54,6 +52,7 @@ public class ItemServiceImpl implements ItemService {
             }
             return itemDTOS;
         } catch (Exception e) {
+            log.error("Error fetching items: {}", e.getMessage(), e);
             throw e;
         }
     }
@@ -61,18 +60,22 @@ public class ItemServiceImpl implements ItemService {
     @Override
     public void updateItem(ItemDTO itemDTO) {
         log.info("updateItem");
-        try{
-            if(itemDTO.getId() == null){
+        try {
+            if (itemDTO.getId() == null) {
                 throw new RuntimeException("item id is null");
             }
-            if(itemDTO.getName() == null){
+            if (itemDTO.getName() == null) {
                 throw new RuntimeException("item name is null");
             }
             Optional<Item> itemOptional = itemRepository.findById(itemDTO.getId());
+            if (!itemOptional.isPresent()) {
+                throw new RuntimeException("Item not found");
+            }
             Item item = itemOptional.get();
             item.setName(itemDTO.getName());
             itemRepository.save(item);
-        }catch (Exception e){
+        } catch (Exception e) {
+            log.error("Error updating item: {}", e.getMessage(), e);
             throw new RuntimeException(e);
         }
     }
@@ -80,7 +83,7 @@ public class ItemServiceImpl implements ItemService {
     @Override
     public List<ItemDTO> getItemsByName(String itemName) {
         log.info("getItemsByName");
-        try{
+        try {
             List<ItemDTO> itemDTOS = new ArrayList<>();
             List<Item> items = itemRepository.filterItems(itemName);
             for (Item item : items) {
@@ -90,8 +93,8 @@ public class ItemServiceImpl implements ItemService {
                 itemDTOS.add(itemDTO);
             }
             return itemDTOS;
-
-        }catch (Exception e){
+        } catch (Exception e) {
+            log.error("Error filtering items: {}", e.getMessage(), e);
             throw new RuntimeException(e);
         }
     }

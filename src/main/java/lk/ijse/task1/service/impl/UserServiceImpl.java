@@ -16,6 +16,7 @@ import java.util.Optional;
 public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
+
     public UserServiceImpl(UserRepository userRepository) {
         this.userRepository = userRepository;
     }
@@ -23,14 +24,11 @@ public class UserServiceImpl implements UserService {
     @Override
     public void saveUser(UserDTO userDTO) {
         log.info("UserServiceImpl saveUser");
-        try{
-            if(userDTO.getId()==null){
-                throw new RuntimeException("user id is null");
-            }
-            if(userDTO.getName()==null){
+        try {
+            if (userDTO.getName() == null) {
                 throw new RuntimeException("user name is null");
             }
-            if(userDTO.getRole()==null){
+            if (userDTO.getRole() == null) {
                 throw new RuntimeException("user role is null");
             }
             User user = new User();
@@ -38,6 +36,7 @@ public class UserServiceImpl implements UserService {
             user.setRole(userDTO.getRole());
             userRepository.save(user);
         } catch (Exception e) {
+            log.error("Error saving user: {}", e.getMessage(), e);
             throw new RuntimeException(e);
         }
     }
@@ -45,17 +44,19 @@ public class UserServiceImpl implements UserService {
     @Override
     public List<UserDTO> getUsers() {
         log.info("UserServiceImpl getUsers");
-        try{
+        try {
             List<User> users = userRepository.findAll();
             List<UserDTO> userDTOS = new ArrayList<>();
             for (User user : users) {
                 UserDTO userDTO = new UserDTO();
-                userDTO.setName(user.getName());
                 userDTO.setId(user.getId());
+                userDTO.setName(user.getName());
+                userDTO.setRole(user.getRole()); // Mapped the forgotten role
                 userDTOS.add(userDTO);
             }
             return userDTOS;
         } catch (Exception e) {
+            log.error("Error retrieving users: {}", e.getMessage(), e);
             throw new RuntimeException(e);
         }
     }
@@ -63,25 +64,26 @@ public class UserServiceImpl implements UserService {
     @Override
     public void updateUser(UserDTO userDTO) {
         log.info("UserServiceImpl updateUser");
-        try{
-            if(userDTO.getId()==null){
+        try {
+            if (userDTO.getId() == null) {
                 throw new RuntimeException("user id is null");
             }
-            if(userDTO.getName()==null){
+            if (userDTO.getName() == null) {
                 throw new RuntimeException("user name is null");
             }
-            if(userDTO.getRole()==null){
+            if (userDTO.getRole() == null) {
                 throw new RuntimeException("user role is null");
             }
             Optional<User> optionalUser = userRepository.findById(userDTO.getId());
-            if(!optionalUser.isPresent()){
+            if (!optionalUser.isPresent()) {
                 throw new RuntimeException("user not found");
             }
             User user = optionalUser.get();
             user.setName(userDTO.getName());
             user.setRole(userDTO.getRole());
             userRepository.save(user);
-        }catch(Exception e){
+        } catch (Exception e) {
+            log.error("Error updating user: {}", e.getMessage(), e);
             throw new RuntimeException(e);
         }
     }

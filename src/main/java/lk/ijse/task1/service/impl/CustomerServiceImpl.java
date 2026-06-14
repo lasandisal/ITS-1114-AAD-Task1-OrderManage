@@ -24,35 +24,29 @@ public class CustomerServiceImpl implements CustomerService {
     @Override
     public void saveCustomer(CustomerDTO customerDTO) {
         log.info("Saving customer into DB");
-        try{
+        try {
+            if (customerDTO.getName() == null) {
+                throw new RuntimeException("Customer name is null");
+            }
+            if (customerDTO.getAddress() == null) {
+                throw new RuntimeException("Customer address is null");
+            }
+
             Customer customer = new Customer();
-
-            if(customerDTO.getName() ==null){
-                throw new Exception("Customer name is null");
-            }
-
-            if(customerDTO.getName() ==null){
-                throw new Exception("Customer name is null");
-            }
-
-            if(customerDTO.getAddress() ==null){
-                throw new Exception("Customer address is null");
-            }
-
             customer.setName(customerDTO.getName());
             customer.setAddress(customerDTO.getAddress());
 
             customerRepository.save(customer);
-
-        }catch(Exception e){
-            log.error("Error while saving customer into DB" + e.getMessage());
+        } catch (Exception e) {
+            log.error("Error while saving customer into DB: {}", e.getMessage(), e);
+            throw new RuntimeException(e.getMessage(), e);
         }
     }
 
     @Override
     public List<CustomerDTO> getCustomers() {
-        log.info("Getting customers into DB");
-        try{
+        log.info("Getting customers from DB");
+        try {
             List<Customer> customers = customerRepository.findAll();
             List<CustomerDTO> customerDTOs = new ArrayList<>();
             for (Customer customer : customers) {
@@ -63,26 +57,30 @@ public class CustomerServiceImpl implements CustomerService {
                 customerDTOs.add(customerDTO);
             }
             return customerDTOs;
-        }catch(Exception e){
-            log.error("Error while getting customers into DB" + e.getMessage());
+        } catch (Exception e) {
+            log.error("Error while getting customers: {}", e.getMessage(), e);
             throw e;
         }
     }
 
     @Override
     public void updateCustomer(CustomerDTO customerDTO) {
-        log.info("Updating customer into DB");
-        try{
+        log.info("Updating customer in DB");
+        try {
+            if (customerDTO.getId() == null) {
+                throw new RuntimeException("Customer ID is required for update");
+            }
             Optional<Customer> optionalCustomer = customerRepository.findById(customerDTO.getId());
-            if(!optionalCustomer.isPresent()){
-                throw new Exception("Customer not found");
+            if (!optionalCustomer.isPresent()) {
+                throw new RuntimeException("Customer not found");
             }
             Customer customer = optionalCustomer.get();
             customer.setName(customerDTO.getName());
             customer.setAddress(customerDTO.getAddress());
             customerRepository.save(customer);
-            }catch(Exception e){
-            log.error("Error while updating customer into DB" + e.getMessage());
+        } catch (Exception e) {
+            log.error("Error while updating customer: {}", e.getMessage(), e);
+            throw new RuntimeException(e.getMessage(), e);
         }
     }
 }
