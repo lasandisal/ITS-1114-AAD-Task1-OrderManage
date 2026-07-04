@@ -84,15 +84,16 @@ public class ItemServiceImpl implements ItemService {
     public List<ItemDTO> getItemsByName(String itemName) {
         log.info("getItemsByName");
         try {
-            List<ItemDTO> itemDTOS = new ArrayList<>();
-            List<Item> items = itemRepository.filterItems(itemName);
-            for (Item item : items) {
-                ItemDTO itemDTO = new ItemDTO();
-                itemDTO.setName(item.getName());
-                itemDTO.setId(item.getId());
-                itemDTOS.add(itemDTO);
-            }
-            return itemDTOS;
+//            List<ItemDTO> itemDTOS = new ArrayList<>();
+//            List<Item> items = itemRepository.filterItems(itemName);
+//            for (Item item : items) {
+//                ItemDTO itemDTO = new ItemDTO();
+//                itemDTO.setName(item.getName());
+//                itemDTO.setId(item.getId());
+//                itemDTOS.add(itemDTO);
+//            }
+//            return itemDTOS;
+            return itemRepository.filterItemsJPQL(itemName);
         } catch (Exception e) {
             log.error("Error filtering items: {}", e.getMessage(), e);
             throw new RuntimeException(e);

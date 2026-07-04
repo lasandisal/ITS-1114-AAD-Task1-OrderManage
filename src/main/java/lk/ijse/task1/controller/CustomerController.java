@@ -2,6 +2,7 @@ package lk.ijse.task1.controller;
 
 import lk.ijse.task1.constant.CommonResponse;
 import lk.ijse.task1.dto.CustomerDTO;
+import lk.ijse.task1.dto.FilterOrderDTO;
 import lk.ijse.task1.service.CustomerService;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
@@ -37,5 +38,11 @@ public class CustomerController {
     public CommonResponse updateCustomer(@RequestBody CustomerDTO customerDTO) {
         customerService.updateCustomer(customerDTO);
         return new CommonResponse(OPERATION_SUCCESS,SUCCESS_MESSAGE);
+    }
+
+    @GetMapping(value = "/customerOrders", produces = MediaType.APPLICATION_JSON_VALUE)
+    public CommonResponse getCustomerOrders(@PathVariable long customerId) {
+        List<FilterOrderDTO> orderList = customerService.getCustomerOrders(customerId);
+        return new CommonResponse(OPERATION_SUCCESS, orderList, SUCCESS_MESSAGE);
     }
 }
