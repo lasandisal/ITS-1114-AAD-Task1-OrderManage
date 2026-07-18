@@ -1,7 +1,9 @@
 package lk.ijse.task1.controller;
 
 import lk.ijse.task1.constant.CommonResponse;
+import lk.ijse.task1.dto.AuthDTO;
 import lk.ijse.task1.dto.UserDTO;
+import lk.ijse.task1.security.JwtUtil;
 import lk.ijse.task1.service.UserService;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
@@ -15,9 +17,11 @@ import static lk.ijse.task1.constant.ResponseStatusCode.OPERATION_SUCCESS;
 @RequestMapping(value = "v1/users")
 public class UserController {
     private final UserService userService;
+    private final JwtUtil jwtUtil;
 
-    public UserController(UserService userService) {
+    public UserController(UserService userService, JwtUtil jwtUtil) {
         this.userService = userService;
+        this.jwtUtil = jwtUtil;
     }
 
     @PostMapping(produces = MediaType.APPLICATION_JSON_VALUE)
@@ -36,5 +40,13 @@ public class UserController {
     public CommonResponse updateUser(@RequestBody UserDTO userDTO) {
         userService.updateUser(userDTO);
         return new CommonResponse(OPERATION_SUCCESS, SUCCESS_MESSAGE);
+    }
+
+    @PostMapping(value = "/login",produces = MediaType.APPLICATION_JSON_VALUE)
+    public CommonResponse login(@RequestBody AuthDTO  authDTO) {
+        UserDTO userDetails = userService.getUserDetails(authDTO.getUserName(), authDTO.getPassword());
+        System.out.println("Login API called for username : " + authDTO.getUserName());
+        String token = jwtUtil.generateToken(userDetails);
+        return new CommonResponse(0, token, "JWT Token");
     }
 }

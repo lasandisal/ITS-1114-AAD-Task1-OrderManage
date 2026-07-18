@@ -34,6 +34,7 @@ public class UserServiceImpl implements UserService {
             User user = new User();
             user.setName(userDTO.getName());
             user.setRole(userDTO.getRole());
+            user.setPassword(userDTO.getPassword());
             userRepository.save(user);
         } catch (Exception e) {
             log.error("Error saving user: {}", e.getMessage(), e);
@@ -81,10 +82,28 @@ public class UserServiceImpl implements UserService {
             User user = optionalUser.get();
             user.setName(userDTO.getName());
             user.setRole(userDTO.getRole());
+            user.setPassword(userDTO.getPassword());
             userRepository.save(user);
         } catch (Exception e) {
             log.error("Error updating user: {}", e.getMessage(), e);
             throw new RuntimeException(e);
         }
+    }
+
+    @Override
+    public UserDTO getUserDetails(String username, String password) {
+        Optional<User> optionalUser = userRepository.findByNameAndPassword(username, password);
+        if (!optionalUser.isPresent()) {
+            throw new RuntimeException("user not found");
+        }
+        User user = optionalUser.get();
+
+        UserDTO userDTO = new UserDTO();
+        userDTO.setName(user.getName());
+        userDTO.setRole(user.getRole());
+        userDTO.setPassword(user.getPassword());
+
+        return userDTO;
+
     }
 }
